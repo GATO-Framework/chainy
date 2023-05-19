@@ -8,7 +8,7 @@ def get_requirements():
 
 setup(
     name="chainy",
-    version="0.1.0-dev1",
+    version="0.1.0-dev2",
     description="Declarative prompt chaining",
     author="Lucas Lofaro",
     author_email="lucasmlofaro@gmail.com",
