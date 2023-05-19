@@ -15,7 +15,9 @@ setup(
     url="https://github.com/FyZyX/chainy",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=get_requirements(),
+    install_requires=[
+        "pyyaml~=6.0",
+    ],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
