@@ -9,10 +9,10 @@ from . import llm
 class Prompt:
     _default_path = pathlib.Path("prompts")
 
-    def __init__(self, template_path: str, variables: dict[str, str]):
+    def __init__(self, model: str, template_path: str, variables: dict[str, str]):
+        self._model = model
         self._template = self._load(template_path)
         self._variables = variables
-        self._model = ""
 
     def _load(self, filename):
         path = self._default_path / filename
@@ -21,7 +21,7 @@ class Prompt:
         with open(path) as file:
             return file.read()
 
-    def model(self):
+    def model(self) -> str:
         return self._model
 
     def dependencies(self):

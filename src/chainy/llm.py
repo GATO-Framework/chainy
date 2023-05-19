@@ -4,12 +4,12 @@ ChatMessages: TypeAlias = list[dict[str, str]]
 
 
 class LanguageModelProtocol(Protocol):
-    def generate(self, prompt: str) -> str:
+    async def generate(self, prompt: str) -> str:
         ...
 
 
 class ChatModelProtocol(Protocol):
-    def generate(self, messages: ChatMessages) -> str:
+    async def generate(self, messages: ChatMessages) -> str:
         ...
 
 

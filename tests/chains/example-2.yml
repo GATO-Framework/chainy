@@ -3,25 +3,30 @@ inputs:
   - input_2
 prompts:
   prompt_1:
+    model: my-llm
     template: tmpl01.md
     substitute:
       var_1: input_1
       var_2: input_2
   prompt_2:
+    model: my-llm
     template: tmpl02.md
     substitute:
       res_1: prompt_1
   prompt_3:
+    model: my-llm
     template: tmpl03.md
     substitute:
       res_1: prompt_1
       var_1: input_2
   prompt_4:
+    model: my-llm
     template: tmpl04.md
     substitute:
       res_1: prompt_2
       res_2: prompt_3
   prompt_5:
+    model: my-llm
     template: tmpl05.md
     substitute:
       res_1: prompt_4
