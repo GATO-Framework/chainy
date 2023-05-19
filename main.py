@@ -11,7 +11,7 @@ class Chain:
         self._prompts = prompts
 
 
-def parse_config(path: pathlib.Path):
+def parse_config(path: pathlib.Path) -> Chain:
     with open(path, "r") as file:
         chain: dict = yaml.safe_load(file)
     name = path.name.removesuffix(".yml").removesuffix(".yaml")
@@ -20,7 +20,11 @@ def parse_config(path: pathlib.Path):
     return Chain(name, inputs, prompts)
 
 
-if __name__ == '__main__':
+def main():
     chain_path = pathlib.Path("chains/example-1.yml")
-    chain_config = parse_config(chain_path)
-    pprint.pprint(chain_config)
+    chain = parse_config(chain_path)
+    pprint.pprint(chain._prompts)
+
+
+if __name__ == '__main__':
+    main()
