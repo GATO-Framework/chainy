@@ -3,7 +3,7 @@ import pathlib
 import string
 from typing import TypeAlias, Generator
 
-from . import llm
+from . import llm, config
 
 
 class Prompt:
@@ -45,6 +45,10 @@ class Chain:
         self._outputs = {}
         self._graph: DependencyGraph = {}
         self._models: dict[str, llm.LargeLanguageModel] = {}
+
+    @classmethod
+    def from_config(cls, path: pathlib.Path | str) -> "Chain":
+        return config.parse_chain_config(pathlib.Path(path))
 
     def _build_dependency_graph(self):
         self._graph = {prompt: set() for prompt in self._prompts}

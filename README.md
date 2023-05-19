@@ -44,11 +44,16 @@ The dependencies between prompts are defined in the substitute section: `prompt_
 To run a chain, call the `Chain.start()` method with the required input values:
 
 ```python
-import pathlib
-import chainy.config
+from chainy.model import Chain
 
-chain_path = pathlib.Path("chains/example-1.yml")
-chain = chainy.config.parse_config(chain_path)
+# STEP 1: Load your chain from configuration
+chain = Chain.from_config("chains/example-1.yml")
+
+# STEP 2: Add your model(s)
+model = None  # instantiate your model here!
+chain.add_model("my-model", model)
+
+# STEP 3: Start the chain
 chain.start("hey", "bud")
 ```
 

@@ -10,7 +10,7 @@ from tests import mock_llm
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         chain_path = pathlib.Path("chains/example-2.yml")
-        chain = chainy.config.parse_config(chain_path)
+        chain = chainy.config.parse_chain_config(chain_path)
         t = time.perf_counter()
         chain.add_model("my-llm", mock_llm.MockLanguageModel())
         asyncio.run(chain.start("hey", "bud"))
