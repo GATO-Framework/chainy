@@ -1,5 +1,6 @@
 import asyncio
 import pathlib
+import time
 
 import yaml
 
@@ -19,7 +20,9 @@ def parse_config(path: pathlib.Path) -> Chain:
 def main():
     chain_path = pathlib.Path("chains/example-2.yml")
     chain = parse_config(chain_path)
+    t = time.perf_counter()
     asyncio.run(chain.start("hey", "bud"))
+    print(time.perf_counter() - t)
 
 
 if __name__ == '__main__':
