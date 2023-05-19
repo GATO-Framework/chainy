@@ -1,6 +1,8 @@
 import pathlib
 import string
 
+import llm
+
 
 class Prompt:
     _default_path = pathlib.Path("prompts")
@@ -29,6 +31,10 @@ class Chain:
 
     def start(self, *input_values: str):
         inputs = dict(zip(self._inputs, input_values))
-        for name, prompt in self._prompts.items():
-            print(name, prompt.substitute(inputs, self._outputs))
+        for name, template in self._prompts.items():
+            prompt = template.substitute(inputs, self._outputs)
+            model = llm.MockLanguageModel()
+            output = model.generate(prompt)
+            self._outputs[name] = output
+            print(name, prompt)
             print("----")
