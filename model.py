@@ -15,6 +15,9 @@ class Prompt:
         with open(self._default_path / filename) as file:
             return file.read()
 
+    def dependencies(self):
+        return self._variables.values()
+
     def substitute(self, inputs, outputs):
         template = string.Template(self._template)
         variables = {name: inputs.get(key) or outputs.get(key)
@@ -28,6 +31,41 @@ class Chain:
         self._inputs = inputs
         self._prompts = prompts
         self._outputs = {}
+
+    def _build_dependency_graph(self) -> dict[str, set[str]]:
+        graph = {prompt: set() for prompt in self._prompts}
+
+        for name, prompt in self._prompts.items():
+            for var in prompt.dependencies():
+                is_prompt = var in self._prompts
+                is_self = var == name
+                if is_self or not is_prompt:
+                    continue
+                graph[name].add(var)
+
+        return graph
+
+    def _topological_sort(self, graph: dict[str, set[str]]) -> list[set[str]]:
+        # Create a list that will hold the batches of nodes
+        result = []
+
+        # While there are nodes in the graph
+        while graph:
+            # Find all nodes with no incoming edges
+            batch = {node for node, edges in graph.items() if not edges}
+            if not batch:
+                raise ValueError("Cycle detected in graph")
+
+            # Remove these nodes from the graph
+            for node in batch:
+                graph.pop(node)
+            for edges in graph.values():
+                edges.difference_update(batch)
+
+            # Add this batch to the result
+            result.append(batch)
+
+        return result
 
     def start(self, *input_values: str):
         inputs = dict(zip(self._inputs, input_values))
