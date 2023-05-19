@@ -14,11 +14,11 @@ class ChatModelProtocol(Protocol):
 
 
 class MockLanguageModel:
-    def generate(self, prompt: str) -> str:
+    async def generate(self, prompt: str) -> str:
         return f"Mock prompt response for {prompt}"
 
 
 class MockChatModel:
-    def generate(self, messages: ChatMessages) -> str:
+    async def generate(self, messages: ChatMessages) -> str:
         result = "\n".join((f"{m['system']}: {m['content']}" for m in messages))
         return f"Mock prompt response for {result}"

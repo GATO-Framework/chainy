@@ -1,3 +1,4 @@
+import asyncio
 import pathlib
 import string
 
@@ -70,15 +71,22 @@ class Chain:
 
         return result
 
-    def start(self, *input_values: str):
+    async def _execute_prompt(self, name, inputs):
+        prompt = self._prompts[name]
+        prompt_str = prompt.substitute(inputs, self._outputs)
+        model = llm.MockLanguageModel()
+        return await model.generate(prompt_str)
+
+    async def start(self, *input_values: str):
         graph = self._build_dependency_graph()
+        batches = self._topological_sort(graph)
+
         print(graph)
-        print(self._topological_sort(graph))
+        print(batches)
         inputs = dict(zip(self._inputs, input_values))
-        for name, template in self._prompts.items():
-            prompt = template.substitute(inputs, self._outputs)
-            model = llm.MockLanguageModel()
-            output = model.generate(prompt)
-            self._outputs[name] = output
-            print(name, prompt)
-            print("----")
+        for batch in batches:
+            tasks = [self._execute_prompt(name, inputs) for name in batch]
+            results = await asyncio.gather(*tasks)
+            for name, output in zip(batch, results):
+                print(name, output)
+                self._outputs[name] = output
