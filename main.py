@@ -1,7 +1,18 @@
 import pathlib
 import pprint
+import string
 
 import yaml
+
+
+class Prompt:
+    def __init__(self, template, variables):
+        self._template = template
+        self._variables = variables
+
+    def substitute(self):
+        template = string.Template(self._template)
+        return template.substitute(self._variables)
 
 
 class Chain:
@@ -16,7 +27,8 @@ def parse_config(path: pathlib.Path) -> Chain:
         chain: dict = yaml.safe_load(file)
     name = path.name.removesuffix(".yml").removesuffix(".yaml")
     inputs = chain.pop("inputs")
-    prompts = chain.pop("prompts")
+    prompts = {name: Prompt(prompt["template"], prompt["substitute"])
+               for name, prompt in chain.pop("prompts").items()}
     return Chain(name, inputs, prompts)
 
 
