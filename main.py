@@ -1,5 +1,4 @@
 import pathlib
-import pprint
 import string
 
 import yaml
@@ -8,18 +7,19 @@ import yaml
 class Prompt:
     _default_path = pathlib.Path("prompts")
 
-    def __init__(self, template, variables):
-        self._template = self._load(template)
+    def __init__(self, template_path: str, variables: dict[str, str]):
+        self._template = self._load(template_path)
         self._variables = variables
 
     def _load(self, filename):
         with open(self._default_path / filename) as file:
             return file.read()
 
-    def substitute(self):
-        print(self._template)
+    def substitute(self, inputs, outputs):
         template = string.Template(self._template)
-        return template.substitute(self._variables)
+        variables = {name: inputs.get(key) or outputs.get(key)
+                     for name, key in self._variables.items()}
+        return template.substitute(variables)
 
 
 class Chain:
@@ -27,10 +27,13 @@ class Chain:
         self._name = name
         self._inputs = inputs
         self._prompts = prompts
+        self._outputs = {}
 
-    def start(self):
+    def start(self, *input_values: str):
+        inputs = dict(zip(self._inputs, input_values))
         for name, prompt in self._prompts.items():
-            print(name, prompt.substitute())
+            print(name, prompt.substitute(inputs, self._outputs))
+            print("----")
 
 
 def parse_config(path: pathlib.Path) -> Chain:
@@ -46,7 +49,7 @@ def parse_config(path: pathlib.Path) -> Chain:
 def main():
     chain_path = pathlib.Path("chains/example-1.yml")
     chain = parse_config(chain_path)
-    pprint.pprint(chain.start())
+    chain.start("hey", "bud")
 
 
 if __name__ == '__main__':

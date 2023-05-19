@@ -1,13 +1,13 @@
 inputs:
-  - input-1
-  - input-2
+  - input_1
+  - input_2
 prompts:
-  prompt-1:
+  prompt_1:
     template: tmpl01.md
     substitute:
-      var1: input-1
-      var2: input-2
-  prompt-2:
+      var_1: input_1
+      var_2: input_2
+  prompt_2:
     template: tmpl02.md
     substitute:
-      res1: prompt-1
+      res_1: prompt_1
