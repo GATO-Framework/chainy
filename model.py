@@ -1,6 +1,7 @@
 import asyncio
 import pathlib
 import string
+from typing import TypeAlias, Generator
 
 import llm
 
@@ -29,47 +30,44 @@ class Prompt:
         return template.substitute(variables)
 
 
+DependencyGraph: TypeAlias = dict[str, set[str]]
+
+
 class Chain:
     def __init__(self, name, inputs: list[str], prompts: dict[str, Prompt]):
         self._name = name
         self._inputs = inputs
         self._prompts = prompts
         self._outputs = {}
+        self._graph: DependencyGraph = {}
 
-    def _build_dependency_graph(self) -> dict[str, set[str]]:
-        graph = {prompt: set() for prompt in self._prompts}
-
+    def _build_dependency_graph(self):
+        self._graph = {prompt: set() for prompt in self._prompts}
         for name, prompt in self._prompts.items():
             for var in prompt.dependencies():
                 is_prompt = var in self._prompts
                 is_self = var == name
                 if is_self or not is_prompt:
                     continue
-                graph[name].add(var)
+                self._graph[name].add(var)
 
-        return graph
+    def _batch_tasks(self) -> Generator[set[str], None, None]:
+        self._build_dependency_graph()
 
-    def _topological_sort(self, graph: dict[str, set[str]]) -> list[set[str]]:
-        # Create a list that will hold the batches of nodes
-        result = []
-
-        # While there are nodes in the graph
-        while graph:
+        # Perform a topological sort
+        while self._graph:
             # Find all nodes with no incoming edges
-            batch = {node for node, edges in graph.items() if not edges}
+            batch = {node for node, edges in self._graph.items() if not edges}
             if not batch:
                 raise ValueError("Cycle detected in graph")
 
             # Remove these nodes from the graph
             for node in batch:
-                graph.pop(node)
-            for edges in graph.values():
+                self._graph.pop(node)
+            for edges in self._graph.values():
                 edges.difference_update(batch)
 
-            # Add this batch to the result
-            result.append(batch)
-
-        return result
+            yield batch
 
     async def _execute_prompt(self, name, inputs):
         prompt = self._prompts[name]
@@ -78,13 +76,8 @@ class Chain:
         return await model.generate(prompt_str)
 
     async def start(self, *input_values: str):
-        graph = self._build_dependency_graph()
-        batches = self._topological_sort(graph)
-
-        print(graph)
-        print(batches)
         inputs = dict(zip(self._inputs, input_values))
-        for batch in batches:
+        for batch in self._batch_tasks():
             tasks = [self._execute_prompt(name, inputs) for name in batch]
             results = await asyncio.gather(*tasks)
             for name, output in zip(batch, results):
