@@ -11,3 +11,6 @@ class LanguageModelProtocol(Protocol):
 class ChatModelProtocol(Protocol):
     def generate(self, messages: ChatMessages) -> str:
         ...
+
+
+LargeLanguageModel: TypeAlias = LanguageModelProtocol | ChatModelProtocol
