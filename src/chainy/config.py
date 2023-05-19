@@ -1,10 +1,8 @@
-import asyncio
 import pathlib
-import time
 
 import yaml
 
-from model import Chain, Prompt
+from .model import Chain, Prompt
 
 
 def parse_config(path: pathlib.Path) -> Chain:
@@ -15,15 +13,3 @@ def parse_config(path: pathlib.Path) -> Chain:
     prompts = {name: Prompt(prompt["template"], prompt["substitute"])
                for name, prompt in chain.pop("prompts").items()}
     return Chain(name, inputs, prompts)
-
-
-def main():
-    chain_path = pathlib.Path("chains/example-2.yml")
-    chain = parse_config(chain_path)
-    t = time.perf_counter()
-    asyncio.run(chain.start("hey", "bud"))
-    print(time.perf_counter() - t)
-
-
-if __name__ == '__main__':
-    main()

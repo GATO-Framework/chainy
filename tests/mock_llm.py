@@ -1,17 +1,7 @@
 import asyncio
-from typing import Protocol, TypeAlias
+from typing import TypeAlias
 
 ChatMessages: TypeAlias = list[dict[str, str]]
-
-
-class LanguageModelProtocol(Protocol):
-    def generate(self, prompt: str) -> str:
-        ...
-
-
-class ChatModelProtocol(Protocol):
-    def generate(self, messages: ChatMessages) -> str:
-        ...
 
 
 class MockLanguageModel:

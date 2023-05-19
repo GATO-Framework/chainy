@@ -12,6 +12,7 @@ class Prompt:
     def __init__(self, template_path: str, variables: dict[str, str]):
         self._template = self._load(template_path)
         self._variables = variables
+        self._model = ""
 
     def _load(self, filename):
         path = self._default_path / filename
@@ -19,6 +20,9 @@ class Prompt:
             return ""
         with open(path) as file:
             return file.read()
+
+    def model(self):
+        return self._model
 
     def dependencies(self):
         return self._variables.values()
@@ -40,6 +44,7 @@ class Chain:
         self._prompts = prompts
         self._outputs = {}
         self._graph: DependencyGraph = {}
+        self._models = {}
 
     def _build_dependency_graph(self):
         self._graph = {prompt: set() for prompt in self._prompts}
@@ -72,7 +77,7 @@ class Chain:
     async def _execute_prompt(self, name, inputs):
         prompt = self._prompts[name]
         prompt_str = prompt.substitute(inputs, self._outputs)
-        model = llm.MockLanguageModel()
+        model = self._models[prompt.model()]
         return await model.generate(prompt_str)
 
     async def start(self, *input_values: str):
