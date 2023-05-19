@@ -65,10 +65,13 @@ chain.start("hey", "bud")
 ```
 
 ## Testing
+
 Tests are located in the `tests/` directory. To run them, use your preferred test runner.
 
 ## Contributing
+
 We welcome contributions! Please open an issue or submit a pull request if you have something to add.
 
 ## License
-MIT
+
+[MIT](https://choosealicense.com/licenses/mit/)

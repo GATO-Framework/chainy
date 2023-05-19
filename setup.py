@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 
-def get_requirements():
-    with open('requirements.txt') as f:
-        return f.read().strip().splitlines()
+def get_long_description():
+    with open('README.md') as file:
+        return file.read()
 
 
 setup(
     name="chainy",
-    version="0.1.0-dev2",
+    version="0.1.0-dev3",
     description="Declarative prompt chaining",
     author="Lucas Lofaro",
     author_email="lucasmlofaro@gmail.com",
@@ -18,6 +18,9 @@ setup(
     install_requires=[
         "pyyaml~=6.0",
     ],
+    license='MIT',
+    long_description=get_long_description(),
+    long_description_content_type='text/markdown',
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
