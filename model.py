@@ -12,7 +12,10 @@ class Prompt:
         self._variables = variables
 
     def _load(self, filename):
-        with open(self._default_path / filename) as file:
+        path = self._default_path / filename
+        if not path.exists():
+            return ""
+        with open(path) as file:
             return file.read()
 
     def dependencies(self):
@@ -68,6 +71,9 @@ class Chain:
         return result
 
     def start(self, *input_values: str):
+        graph = self._build_dependency_graph()
+        print(graph)
+        print(self._topological_sort(graph))
         inputs = dict(zip(self._inputs, input_values))
         for name, template in self._prompts.items():
             prompt = template.substitute(inputs, self._outputs)

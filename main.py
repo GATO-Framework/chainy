@@ -16,7 +16,7 @@ def parse_config(path: pathlib.Path) -> Chain:
 
 
 def main():
-    chain_path = pathlib.Path("chains/example-1.yml")
+    chain_path = pathlib.Path("chains/example-2.yml")
     chain = parse_config(chain_path)
     chain.start("hey", "bud")
 
