@@ -8,7 +8,7 @@ def get_long_description():
 
 setup(
     name="chainy",
-    version="0.1.0-dev3",
+    version="0.1.0-dev4",
     description="Declarative prompt chaining",
     author="Lucas Lofaro",
     author_email="lucasmlofaro@gmail.com",
