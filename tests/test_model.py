@@ -57,12 +57,14 @@ class TestPrompt(unittest.TestCase):
 
 
 class TestChain(unittest.TestCase):
-    def test_chain_start(self):
+    def setUp(self) -> None:
         chain_path = pathlib.Path("chains/example-2.yml")
-        chain = config.parse_chain_config(chain_path)
+        self._chain = config.parse_chain_config(chain_path)
+
+    def test_chain_start(self):
         t = time.perf_counter()
-        chain.add_model("mock", mock_llm.MockLanguageModel())
-        asyncio.run(chain.start("hey", "bud"))
+        self._chain.add_model("mock", mock_llm.MockLanguageModel())
+        asyncio.run(self._chain.start("hey", "bud"))
         total_time = time.perf_counter() - t
         self.assertLess(total_time, 4.1)
 
