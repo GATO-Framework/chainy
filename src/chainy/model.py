@@ -28,7 +28,7 @@ class Prompt:
         return string.Template(self._load(self._template_path))
 
     def dependencies(self):
-        return self._variables.values()
+        return set(self._variables.values())
 
     def substitute(self, inputs, outputs):
         return self.template().substitute({
