@@ -11,7 +11,7 @@ class Prompt:
 
     def __init__(self, model: str, template_path: str, variables: dict[str, str]):
         self._model = model
-        self._template = self._load(template_path)
+        self._template_path = template_path
         self._variables = variables
 
     def _load(self, filename):
@@ -24,21 +24,24 @@ class Prompt:
     def model(self) -> str:
         return self._model
 
+    def template(self):
+        return string.Template(self._load(self._template_path))
+
     def dependencies(self):
         return self._variables.values()
 
     def substitute(self, inputs, outputs):
-        template = string.Template(self._template)
-        variables = {name: inputs.get(key) or outputs.get(key)
-                     for name, key in self._variables.items()}
-        return template.substitute(variables)
+        return self.template().substitute({
+            name: inputs.get(key) or outputs.get(key)
+            for name, key in self._variables.items()
+        })
 
 
 DependencyGraph: TypeAlias = dict[str, set[str]]
 
 
 class Chain:
-    def __init__(self, name, inputs: list[str], prompts: dict[str, Prompt]):
+    def __init__(self, name: str, inputs: list[str], prompts: dict[str, Prompt]):
         self._name = name
         self._inputs = inputs
         self._prompts = prompts
