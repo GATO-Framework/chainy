@@ -10,26 +10,50 @@ from tests import mock_llm
 class TestPrompt(unittest.TestCase):
 
     def setUp(self) -> None:
-        self._prompt = model.Prompt(
+        self._prompt_1 = model.Prompt(
             model="mock",
             template_path="tmpl01.md",
             variables={"var_1": "input_1", "var_2": "input_2"}
         )
-
-    def test_prompt_model(self):
-        self.assertEqual(self._prompt.model(), "mock")
-
-    def test_prompt_dependencies(self):
-        self.assertSetEqual(self._prompt.dependencies(), {"input_1", "input_2"})
-
-    def test_prompt_substitute(self):
-        expected_content = "\n".join([
+        self._prompt_1_output = "\n".join([
             "This is a test.", "",
             "Variable 1: hey",
             "Variable 2: bud",
         ])
-        content = self._prompt.substitute({"input_1": "hey", "input_2": "bud"}, {})
-        self.assertEqual(content, expected_content)
+        self._prompt_2 = model.Prompt(
+            model="mock",
+            template_path="tmpl02.md",
+            variables={"res_1": "prompt_1"}
+        )
+
+    def test_prompt_model(self):
+        self.assertEqual(self._prompt_1.model(), "mock")
+        self.assertEqual(self._prompt_2.model(), "mock")
+
+    def test_prompt_dependencies(self):
+        self.assertSetEqual(self._prompt_1.dependencies(), {"input_1", "input_2"})
+        self.assertSetEqual(self._prompt_2.dependencies(), {"prompt_1"})
+
+    def test_prompt_substitute(self):
+        prompt_1_expected_output = "\n".join([
+            "This is a test.", "",
+            "Variable 1: hey",
+            "Variable 2: bud",
+        ])
+        prompt_2_expected_output = "\n".join([
+            "This is the second prompt.", "",
+            f"Result of prompt 1: {prompt_1_expected_output}",
+        ])
+
+        inputs = {"input_1": "hey", "input_2": "bud"}
+        outputs = {}
+        content = self._prompt_1.substitute(inputs, outputs)
+        self.assertEqual(content, prompt_1_expected_output)
+
+        inputs = {}
+        outputs = {"prompt_1": prompt_1_expected_output}
+        content = self._prompt_2.substitute(inputs, outputs)
+        self.assertEqual(content, prompt_2_expected_output)
 
 
 class TestChain(unittest.TestCase):
